@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Flow\ETL\Adapter\Seal\Tests\Unit;
+namespace Flow\ETL\Adapter\Seal\Tests\Unit\Values\Schema;
 
 use CmsIg\Seal\Schema\Field;
-use Flow\ETL\Adapter\Seal\SealMetadata;
-use Flow\ETL\Exception\RuntimeException;
+use Flow\ETL\Adapter\Seal\Values\Schema\SealMetadata;
+use Flow\ETL\Foundation\Exception\RuntimeException;
 use Flow\ETL\Tests\FlowTestCase;
 use Flow\Types\Type\Logical\ListType;
 use Flow\Types\Type\Logical\StructureType;

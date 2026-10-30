@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Flow\ETL\Adapter\Seal\Tests\Unit;
+namespace Flow\ETL\Adapter\Seal\Tests\Unit\IO\Loader;
 
 use DateInterval;
 use DateTimeImmutable;
 use DateTimeZone;
 use DOMDocument;
-use Flow\ETL\Adapter\Seal\SealEncoder;
+use Flow\ETL\Adapter\Seal\IO\Loader\SealEncoder;
 use Flow\ETL\Tests\Fixtures\Enum\BackedStringEnum;
 use Flow\ETL\Tests\FlowTestCase;
 use Flow\Types\Type;

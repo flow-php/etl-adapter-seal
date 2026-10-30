@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Flow\ETL\Adapter\Seal\Tests\Integration;
+namespace Flow\ETL\Adapter\Seal\Tests\Integration\IO\Loader;
 
 use Flow\ETL\Adapter\Seal\Tests\IntegrationTestCase;
 
@@ -32,13 +32,13 @@ final class SealLoaderTest extends IntegrationTestCase
                 [['id' => '1', 'name' => 'Alice'], ['id' => '2', 'name' => 'Bob']],
                 schema(string_schema('id'), string_schema('name')),
             ),
-            flow_context(),
+            flow_context()->backend(),
         );
         $this->sealContext()->refresh();
 
         to_seal_delete($engine, 'users')->load(array_to_rows([[
             'id' => '1',
-        ]], schema(string_schema('id'))), flow_context());
+        ]], schema(string_schema('id'))), flow_context()->backend());
         $this->sealContext()->refresh();
 
         static::assertSame(1, $engine->countDocuments('users'));
@@ -58,13 +58,13 @@ final class SealLoaderTest extends IntegrationTestCase
                 [['sku' => 'SKU_0001', 'name' => 'Keyboard']],
                 schema(string_schema('sku'), string_schema('name')),
             ),
-            flow_context(),
+            flow_context()->backend(),
         );
         $this->sealContext()->refresh();
 
         to_seal_delete($engine, 'products')
             ->withIdentifierColumn('sku')
-            ->load(array_to_rows([['sku' => 'SKU_0001']], schema(string_schema('sku'))), flow_context());
+            ->load(array_to_rows([['sku' => 'SKU_0001']], schema(string_schema('sku'))), flow_context()->backend());
         $this->sealContext()->refresh();
 
         static::assertSame(0, $engine->countDocuments('products'));
@@ -88,7 +88,7 @@ final class SealLoaderTest extends IntegrationTestCase
             ->withBulkSize(3)
             ->load(
                 array_to_rows($documents, schema(str_schema('id'), str_schema('name'), int_schema('age'))),
-                flow_context(),
+                flow_context()->backend(),
             );
         $this->sealContext()->refresh();
 
@@ -108,7 +108,7 @@ final class SealLoaderTest extends IntegrationTestCase
                 [['id' => '1', 'name' => 'Alice', 'age' => 30], ['id' => '2', 'name' => 'Bob', 'age' => 25]],
                 schema(string_schema('id'), string_schema('name'), integer_schema('age')),
             ),
-            flow_context(),
+            flow_context()->backend(),
         );
         $this->sealContext()->refresh();
 
@@ -130,14 +130,14 @@ final class SealLoaderTest extends IntegrationTestCase
                 [['id' => '1', 'name' => 'Alice', 'age' => 30]],
                 schema(string_schema('id'), string_schema('name'), integer_schema('age')),
             ),
-            flow_context(),
+            flow_context()->backend(),
         );
         $loader->load(
             array_to_rows(
                 [['id' => '1', 'name' => 'Alice Updated', 'age' => 31]],
                 schema(string_schema('id'), string_schema('name'), integer_schema('age')),
             ),
-            flow_context(),
+            flow_context()->backend(),
         );
         $this->sealContext()->refresh();
 

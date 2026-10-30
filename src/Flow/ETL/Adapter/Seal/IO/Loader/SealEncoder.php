@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Flow\ETL\Adapter\Seal;
+namespace Flow\ETL\Adapter\Seal\IO\Loader;
 
 use DateTimeInterface;
-use Flow\ETL\Column\Column;
-use Flow\ETL\Column\Physical\IdentityPhysical;
-use Flow\ETL\Column\Physical\PhysicalFor;
-use Flow\ETL\Column\TextValues;
-use Flow\ETL\Rows;
+use Flow\ETL\Values\Column\Column;
+use Flow\ETL\Values\Column\Physical\IdentityPhysical;
+use Flow\ETL\Values\Column\Physical\PhysicalFor;
+use Flow\ETL\Values\Column\TextValues;
+use Flow\ETL\Values\Rows;
 use Flow\Types\Type;
 use Flow\Types\Type\Logical\DateTimeType;
 use Flow\Types\Type\Logical\DateType;
@@ -49,7 +49,7 @@ final class SealEncoder
         $columns = [];
 
         foreach ($rows->schema()->definitions() as $definition) {
-            $name = $definition->reference()->name();
+            $name = $definition->name();
             $columns[$name] = $this->column($definition->type(), $rows->column($name));
         }
 
@@ -121,7 +121,7 @@ final class SealEncoder
         if (
             $bare instanceof TimeType
             || $bare instanceof NullType
-            || (new PhysicalFor())->type($bare) instanceof IdentityPhysical
+            || (new PhysicalFor())->physical($bare) instanceof IdentityPhysical
         ) {
             return $column->physicals();
         }

@@ -2,17 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Flow\ETL\Adapter\Seal;
+namespace Flow\ETL\Adapter\Seal\IO\Loader;
 
 use CmsIg\Seal\EngineInterface;
 use DateTimeInterface;
-use Flow\ETL\Config\Telemetry\TelemetryAttributes;
-use Flow\ETL\Exception\RuntimeException;
-use Flow\ETL\FlowContext;
-use Flow\ETL\Loader;
-use Flow\ETL\Rows;
+use Flow\ETL\Foundation\Describe\Description;
+use Flow\ETL\Foundation\Describe\Rebuild;
+use Flow\ETL\Foundation\Exception\InvalidArgumentException;
+use Flow\ETL\Foundation\Exception\RuntimeException;
+use Flow\ETL\IO\Loader;
+use Flow\ETL\Values\Column\Backend;
+use Flow\ETL\Values\Rows;
 use Generator;
-use Throwable;
+use SensitiveParameter;
 
 use function array_key_exists;
 use function is_int;
@@ -36,28 +38,28 @@ final class SealLoader implements Loader
         private readonly Operation $operation = Operation::UPSERT,
     ) {}
 
-    public function load(Rows $rows, FlowContext $context): void
+    public function load(Rows $rows, Backend $backend): void
     {
         if (!$rows->count()) {
             return;
         }
 
-        $context->telemetry()->loadingStarted($this);
+        $this->engine->bulk(
+            $this->index,
+            $this->operation === Operation::UPSERT ? $this->encoder()->encode($rows) : [],
+            $this->operation === Operation::DELETE ? $this->deleteIdentifiers($rows) : [],
+            $this->bulkSize,
+        );
+    }
 
-        try {
-            $this->engine->bulk(
-                $this->index,
-                $this->operation === Operation::UPSERT ? $this->encoder()->encode($rows) : [],
-                $this->operation === Operation::DELETE ? $this->deleteIdentifiers($rows) : [],
-                $this->bulkSize,
-            );
+    public static function fromDescription(#[SensitiveParameter] array $data, Rebuild $rebuild): static
+    {
+        throw InvalidArgumentException::because('%s holds live state and is never described', self::class);
+    }
 
-            $context->telemetry()->loadingCompleted($this, [TelemetryAttributes::ATTR_LOADING_ROWS => $rows->count()]);
-        } catch (Throwable $e) {
-            $context->telemetry()->loadingFailed($this, $e);
-
-            throw $e;
-        }
+    public function describe(): ?Description
+    {
+        return null;
     }
 
     public function withBulkSize(int $bulkSize): self

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Flow\ETL\Adapter\Seal;
+namespace Flow\ETL\Adapter\Seal\Values\Schema;
 
-use Flow\ETL\Schema\Metadata;
+use Flow\ETL\Values\Schema\Metadata;
 
 enum SealMetadata: string
 {

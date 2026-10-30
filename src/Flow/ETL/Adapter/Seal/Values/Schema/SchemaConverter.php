@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Flow\ETL\Adapter\Seal;
+namespace Flow\ETL\Adapter\Seal\Values\Schema;
 
 use CmsIg\Seal\Schema\Field;
 use CmsIg\Seal\Schema\Field\AbstractField;
 use CmsIg\Seal\Schema\Index;
 use CmsIg\Seal\Schema\Schema as SealSchema;
-use Flow\ETL\Exception\RuntimeException;
-use Flow\ETL\Schema;
-use Flow\ETL\Schema\Definition;
-use Flow\ETL\Schema\Metadata;
+use Flow\ETL\Foundation\Exception\RuntimeException;
+use Flow\ETL\Values\Schema;
+use Flow\ETL\Values\Schema\Definition;
+use Flow\ETL\Values\Schema\Definitions;
+use Flow\ETL\Values\Schema\Metadata;
 use Flow\Types\Type;
 use Flow\Types\Type\Logical\DateTimeType;
 use Flow\Types\Type\Logical\DateType;
@@ -33,7 +34,6 @@ use Flow\Types\Type\Native\IntegerType;
 use Flow\Types\Type\Native\StringType;
 
 use function array_map;
-use function Flow\ETL\DSL\definition_from_type;
 use function Flow\Types\DSL\type_boolean;
 use function Flow\Types\DSL\type_datetime;
 use function Flow\Types\DSL\type_float;
@@ -64,7 +64,7 @@ final class SchemaConverter
         $identifiers = 0;
 
         foreach ($schema->definitions() as $definition) {
-            $name = $definition->reference()->name();
+            $name = $definition->name();
             $metadata = $definition->metadata();
 
             if ($name === $identifier || $metadata->has(SealMetadata::IDENTIFIER->value)) {
@@ -176,7 +176,7 @@ final class SchemaConverter
      */
     private function sealFieldToFlowDefinition(AbstractField $field): Definition
     {
-        return definition_from_type(
+        return Definitions::of(
             $field->name,
             $this->sealFieldToFlowType($field),
             !$field instanceof Field\IdentifierField,
@@ -215,10 +215,9 @@ final class SchemaConverter
         $fields = [];
 
         foreach ($type->elements() as $element) {
-            $elementType = $element->type instanceof OptionalType ? $element->type->base() : $element->type;
             $fields[(string) $element->name] = $this->flowToSealField(
                 (string) $element->name,
-                $elementType,
+                $element->type instanceof OptionalType ? $element->type->base() : $element->type,
                 false,
                 Metadata::empty(),
             );

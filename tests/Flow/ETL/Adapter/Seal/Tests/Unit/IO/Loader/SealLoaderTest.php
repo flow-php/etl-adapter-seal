@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Flow\ETL\Adapter\Seal\Tests\Unit;
+namespace Flow\ETL\Adapter\Seal\Tests\Unit\IO\Loader;
 
 use Flow\ETL\Adapter\Seal\Tests\SealTestCase;
-use Flow\ETL\Exception\RuntimeException;
+use Flow\ETL\Foundation\Exception\RuntimeException;
 
 use function Flow\ETL\Adapter\Seal\to_seal_delete;
 use function Flow\ETL\Adapter\Seal\to_seal_schema;
@@ -32,7 +32,7 @@ final class SealLoaderTest extends SealTestCase
         to_seal_delete($engine, 'users')->load(array_to_rows([['id' => [
             '1',
             '2',
-        ]]], schema(list_schema('id', type_list(type_string())))), flow_context());
+        ]]], schema(list_schema('id', type_list(type_string())))), flow_context()->backend());
     }
 
     public function test_deleting_empty_rows_removes_no_documents(): void
@@ -41,8 +41,8 @@ final class SealLoaderTest extends SealTestCase
 
         to_seal_upsert($engine, 'users')->load(array_to_rows([[
             'id' => '1',
-        ]], schema(string_schema('id'))), flow_context());
-        to_seal_delete($engine, 'users')->load(rows(schema()), flow_context());
+        ]], schema(string_schema('id'))), flow_context()->backend());
+        to_seal_delete($engine, 'users')->load(rows(schema()), flow_context()->backend());
 
         static::assertSame(1, $engine->countDocuments('users'));
     }
@@ -51,7 +51,7 @@ final class SealLoaderTest extends SealTestCase
     {
         $engine = $this->sealContext()->engine(to_seal_schema(schema(str_schema('id')), 'users', 'id'));
 
-        to_seal_upsert($engine, 'users')->load(rows(schema()), flow_context());
+        to_seal_upsert($engine, 'users')->load(rows(schema()), flow_context()->backend());
 
         static::assertSame(0, $engine->countDocuments('users'));
     }
